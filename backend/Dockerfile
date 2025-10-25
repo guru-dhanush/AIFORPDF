@@ -1,23 +1,20 @@
-# Use Node.js LTS
-FROM node:18-alpine
+# Use an official Node.js runtime as the base image
+FROM node:22-alpine AS build-stage
 
-# Set working directory
+# Set the working directory in the container
 WORKDIR /app
 
-# Copy package files
+# Copy package.json and package-lock.json to the container
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN npm install
 
-# Copy source code
+# Copy the application files to the container
 COPY . .
 
-# Expose port
-EXPOSE 5000
+# Expose the port your app listens on
+EXPOSE 8080
 
-# Set environment to production
-ENV NODE_ENV=production
-
-# Start server
-CMD ["npm", "start"]
+# Start the application
+CMD [ "npm", "run", "start" ]

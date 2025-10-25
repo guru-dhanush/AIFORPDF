@@ -5,7 +5,7 @@ import CitationButton from "./CitationButton";
 const MessageItem = ({ message, onCitationClick }: { message: ChatType, onCitationClick: (page: number) => void }) => (
     <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} mb-4`}>
         <div className={`max-w-[80%] rounded-lg px-4 py-3 ${message.role === 'user'
-            ? 'bg-blue-500 text-white'
+            ? ' bg-[#223050] text-white'
             : 'bg-gray-100 text-gray-900'
             }`}>
             <p className="text-sm whitespace-pre-wrap">{message.text}</p>
@@ -22,4 +22,5 @@ const MessageItem = ({ message, onCitationClick }: { message: ChatType, onCitati
 );
 
 export default MessageItem;
+
 

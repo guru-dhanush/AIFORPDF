@@ -23,12 +23,8 @@ const PDFUploader = () => {
         dispatch(setError(null));
 
         try {
-            // Upload to backend and get document metadata
             const { data: { documentId, numPages, suggestedQuestions } } = await uploadDocument(file).unwrap();
-
-            // Process PDF locally for viewer
             const localResult = await apiService.processPDF(file);
-            // Store both backend document ID and local PDF object
             dispatch(setFile({
                 file: localResult.pdfDocument,
                 fileName: file.name,
@@ -47,15 +43,15 @@ const PDFUploader = () => {
     };
 
     return (
-        <div className="relative flex flex-col items-center justify-center p-15 border-6 border-blue-200 rounded-2xl w-[600px] ">
+        <div className="relative flex flex-col items-center justify-center p-15 border-6 border-[#223050] rounded-2xl w-[600px] ">
             <div
                 className="absolute inset-0 bg-[url('/src/assets/uploadbg.png')] bg-cover bg-center opacity-20"
                 style={{ zIndex: -1 }}
             />
             <div className="text-center mb-6">
-                <FileUp className="w-16 h-16 mx-auto mb-4 text-gray-500 " />
-                <h2 className="text-lg font-semibold mb-2 text-gray-500">Upload PDF Document</h2>
-                <p className="text-sm text-gray-500 font-medium">Start by uploading a PDF to analyze and chat about</p>
+                <FileUp className="w-16 h-16 mx-auto mb-4 text-[#223050]" />
+                <h2 className="text-lg font-semibold mb-2 text-[#223050]">Upload PDF Document</h2>
+                <p className="text-sm text-[#223050] font-medium">Start by uploading a PDF to analyze and chat about</p>
             </div>
             <input
                 ref={fileInputRef}
@@ -66,7 +62,7 @@ const PDFUploader = () => {
             />
             <button
                 onClick={() => fileInputRef.current?.click()}
-                className="px-6 py-3 mt-6 bg-blue-500 text-white rounded-2xl hover:bg-blue-600 transition-colors font-medium text-sm"
+                className="px-6 py-3 mt-6 bg-[#223050] text-white rounded-2xl hover:bg-[#445580] transition-colors font-medium text-sm"
             >
                 {isUploading ? <span className="flex items-center"><Loader className="w-5 h-5 mr-2" /> Uploading...</span> : 'Choose PDF File'}
             </button>

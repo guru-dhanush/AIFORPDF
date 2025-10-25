@@ -1,9 +1,13 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-
-const uiInitialState = {
+interface uiStateProps {
+    sidebarOpen: boolean;
+    viewMode: 'pdfview' | 'chatview';
+    theme: string;
+}
+const uiInitialState: uiStateProps = {
     sidebarOpen: true,
-    viewMode: 'split',
+    viewMode: 'chatview',
     theme: 'light'
 };
 

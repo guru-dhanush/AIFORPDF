@@ -1,9 +1,7 @@
 import { api } from '../../app/api';
 
-// Chat API endpoints
 export const chatApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    // Send chat message
     sendMessage: builder.mutation({
       query: ({ documentId, message, chatHistory }) => ({
         url: '/chat',
@@ -14,7 +12,6 @@ export const chatApi = api.injectEndpoints({
           chatHistory: chatHistory || [],
         },
       }),
-      // Don't cache chat responses
       transformResponse: (response) => response.data,
     }),
   }),

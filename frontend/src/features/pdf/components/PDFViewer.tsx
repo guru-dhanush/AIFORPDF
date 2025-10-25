@@ -1,14 +1,17 @@
 import { useDispatch, useSelector } from "react-redux";
 import { setCurrentPage, setScale } from "../pdfSlice";
-import { BookOpen, ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from "lucide-react";
+import { BookOpen, ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut } from "lucide-react";
 import PDFPageCanvas from "./PDFPageCanvas";
 import { useRef } from "react";
+import { setViewMode } from "@/features/dashboard/uiSlice";
+import { useIsMobile } from "@/shared/hooks/use-mobile";
 
 
 const PDFViewer = () => {
     const { currentPage, numPages, scale, fileName, file } = useSelector((state: any) => state.pdf)
     const dispatch = useDispatch();
     const canvasRef = useRef(null);
+    const isMobile = useIsMobile();
 
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= numPages) {
@@ -61,6 +64,14 @@ const PDFViewer = () => {
                         <ZoomIn className="w-5 h-5" />
                     </button>
                 </div>
+                {isMobile && <div className="flex items-center gap-2 border rounded-xl">
+                    <button className="p-1 hover:bg-gray-100 rounded-4xl cursor-pointer"
+                        onClick={() => dispatch(setViewMode('chatview'))}
+
+                    >
+                        <X className="w-5 h-5" />
+                    </button>
+                </div>}
             </div>
 
             {/* PDF Display Area */}

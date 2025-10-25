@@ -10,7 +10,6 @@ const store = configureStore({
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: {
-                // Ignore non-serializable values in specific paths
                 ignoredActions: ['pdf/setFile'],
                 ignoredPaths: ['pdf.file'],
             },

@@ -152,7 +152,7 @@ ${documentText.substring(0, 5000)}
 IMPORTANT: Respond with ONLY a JSON array of strings. Example:
 ["What is the main topic of this document?", "What are the key findings?"]`;
 
-    console.log('Sending prompt to Gemini...');
+    console.log('Sending prompt to Gemini...', prompt);
     const result = await chatModel.generateContent(prompt);
     const response = result.response;
     const responseText = response.text();
@@ -160,21 +160,25 @@ IMPORTANT: Respond with ONLY a JSON array of strings. Example:
     console.log('Raw response from Gemini:', responseText);
 
     try {
-      // Clean up the response to ensure it's valid JSON
-      const jsonMatch = responseText.match(/\[.*\]/s);
-      if (jsonMatch) {
-        const jsonString = jsonMatch[0]
-          .replace(/\n/g, '\\n')  // Preserve newlines in strings
-          .replace(/\t/g, '\\t'); // Preserve tabs in strings
-
-        const questions = JSON.parse(jsonString);
-        console.log('Parsed questions:', questions);
-
-        if (Array.isArray(questions) && questions.length > 0) {
-          return questions;
-        }
+      // Clean up the response to handle markdown code blocks
+      let jsonString = responseText.trim();
+      
+      // Remove markdown code block syntax if present
+      if (jsonString.startsWith('```json')) {
+        jsonString = jsonString.replace(/^```json\s*|```$/g, '').trim();
+      } else if (jsonString.startsWith('```')) {
+        jsonString = jsonString.replace(/^```\s*|```$/g, '').trim();
       }
-      throw new Error('Invalid response format');
+      
+      // Parse the JSON
+      const questions = JSON.parse(jsonString);
+      console.log('Parsed questions:', questions);
+
+      if (Array.isArray(questions) && questions.length > 0) {
+        return questions;
+      }
+      
+      throw new Error('Invalid response format - not an array or empty');
     } catch (e) {
       console.error('Error parsing response as JSON, trying fallback:', e);
       // Fallback: Extract questions from plain text

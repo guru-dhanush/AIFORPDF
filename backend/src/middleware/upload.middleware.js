@@ -2,7 +2,6 @@ import multer from 'multer';
 import path from 'path';
 import { AppError } from './error.middleware.js';
 
-// Configure multer for memory storage
 const storage = multer.memoryStorage();
 
 // File filter to accept only PDFs
@@ -19,6 +18,6 @@ export const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 50 * 1024 * 1024 // 50MB max file size
+    fileSize: 50 * 1024 * 1024 
   }
 });

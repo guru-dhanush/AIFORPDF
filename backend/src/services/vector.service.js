@@ -1,8 +1,7 @@
-import { collection } from '../config/chroma.config.js';
 import { generateEmbedding } from './embedding.service.js';
 import { AppError } from '../middleware/error.middleware.js';
 
-// In-memory fallback if ChromaDB is not available
+// In-memory vector store
 const memoryStore = new Map();
 
 /**
@@ -10,41 +9,22 @@ const memoryStore = new Map();
  */
 export async function storeDocumentVectors(documentId, chunks) {
   try {
-    if (!collection) {
-      // Use in-memory fallback
-      console.log('Using in-memory vector store');
-      memoryStore.set(documentId, chunks);
-      return { success: true, count: chunks.length };
-    }
+    console.log('Storing chunks in memory');
 
     // Generate embeddings for all chunks
-    const texts = chunks.map(chunk => chunk.text);
-    const embeddings = [];
-    
-    // Generate embeddings one by one (Gemini API limitation)
-    for (const text of texts) {
-      const embedding = await generateEmbedding(text);
-      embeddings.push(embedding);
+    const chunksWithEmbeddings = [];
+
+    for (const chunk of chunks) {
+      const embedding = await generateEmbedding(chunk.text);
+      chunksWithEmbeddings.push({
+        ...chunk,
+        embedding
+      });
     }
 
-    // Prepare data for ChromaDB
-    const ids = chunks.map(chunk => `${documentId}_${chunk.id}`);
-    const metadatas = chunks.map(chunk => ({
-      documentId,
-      pageNumber: chunk.pageNumber,
-      chunkIndex: chunk.chunkIndex,
-      text: chunk.text.substring(0, 500) // Store preview
-    }));
-
-    // Add to ChromaDB
-    await collection.add({
-      ids,
-      embeddings,
-      metadatas,
-      documents: texts
-    });
-
+    memoryStore.set(documentId, chunksWithEmbeddings);
     console.log(`✅ Stored ${chunks.length} chunks for document ${documentId}`);
+
     return { success: true, count: chunks.length };
   } catch (error) {
     console.error('Vector storage error:', error);
@@ -57,49 +37,35 @@ export async function storeDocumentVectors(documentId, chunks) {
  */
 export async function searchSimilarChunks(documentId, queryText, topK = 5) {
   try {
-    if (!collection) {
-      // Use in-memory fallback
-      console.log('Using in-memory search');
-      const chunks = memoryStore.get(documentId) || [];
-      
-      // Simple keyword matching fallback
-      const query = queryText.toLowerCase();
-      const results = chunks
-        .map(chunk => ({
-          text: chunk.text,
-          pageNumber: chunk.pageNumber,
-          similarity: chunk.text.toLowerCase().includes(query) ? 0.8 : 0.3
-        }))
-        .sort((a, b) => b.similarity - a.similarity)
-        .slice(0, topK);
-      
-      return results;
+    console.log('Searching in memory store');
+    const chunks = memoryStore.get(documentId) || [];
+
+    if (chunks.length === 0) {
+      return [];
     }
 
     // Generate query embedding
     const queryEmbedding = await generateEmbedding(queryText);
 
-    // Search in ChromaDB
-    const results = await collection.query({
-      queryEmbeddings: [queryEmbedding],
-      nResults: topK,
-      where: { documentId }
+    // Calculate cosine similarity for each chunk
+    const results = chunks.map(chunk => {
+      const similarity = cosineSimilarity(queryEmbedding, chunk.embedding);
+      return {
+        text: chunk.text,
+        pageNumber: chunk.pageNumber,
+        similarity,
+        metadata: {
+          documentId,
+          pageNumber: chunk.pageNumber,
+          chunkIndex: chunk.chunkIndex
+        }
+      };
     });
 
-    // Format results
-    const formattedResults = [];
-    if (results.documents && results.documents[0]) {
-      for (let i = 0; i < results.documents[0].length; i++) {
-        formattedResults.push({
-          text: results.documents[0][i],
-          pageNumber: results.metadatas[0][i].pageNumber,
-          similarity: 1 - (results.distances[0][i] || 0),
-          metadata: results.metadatas[0][i]
-        });
-      }
-    }
-
-    return formattedResults;
+    // Sort by similarity and return top K
+    return results
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, topK);
   } catch (error) {
     console.error('Vector search error:', error);
     throw new AppError(`Failed to search vectors: ${error.message}`, 500);
@@ -111,28 +77,41 @@ export async function searchSimilarChunks(documentId, queryText, topK = 5) {
  */
 export async function deleteDocumentVectors(documentId) {
   try {
-    if (!collection) {
-      memoryStore.delete(documentId);
-      return { success: true };
-    }
-
-    // Get all IDs for this document
-    const results = await collection.get({
-      where: { documentId }
-    });
-
-    if (results.ids && results.ids.length > 0) {
-      await collection.delete({
-        ids: results.ids
-      });
-      console.log(`✅ Deleted ${results.ids.length} vectors for document ${documentId}`);
-    }
-
+    memoryStore.delete(documentId);
+    console.log(`✅ Deleted vectors for document ${documentId}`);
     return { success: true };
   } catch (error) {
     console.error('Vector deletion error:', error);
     throw new AppError(`Failed to delete vectors: ${error.message}`, 500);
   }
+}
+
+/**
+ * Calculate cosine similarity between two vectors
+ */
+function cosineSimilarity(vecA, vecB) {
+  if (vecA.length !== vecB.length) {
+    throw new Error('Vectors must have the same length');
+  }
+
+  let dotProduct = 0;
+  let normA = 0;
+  let normB = 0;
+
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i];
+    normA += vecA[i] * vecA[i];
+    normB += vecB[i] * vecB[i];
+  }
+
+  normA = Math.sqrt(normA);
+  normB = Math.sqrt(normB);
+
+  if (normA === 0 || normB === 0) {
+    return 0;
+  }
+
+  return dotProduct / (normA * normB);
 }
 
 export default {

@@ -9,6 +9,8 @@ import ChatInput from "./ChatInput";
 import playpower_labs_logo from "../../../assets/playpower_labs_logo.jpeg"
 import { Loader } from "@/shared/components/ai-elements/loader";
 import { X } from "lucide-react";
+import { TextShimmer } from "@/shared/components/ui/text-shimmer";
+import { setViewMode } from "@/features/dashboard/uiSlice";
 
 const ChatInterface = () => {
     const { messages, loading, inputValue } = useSelector((state: any) => state.chat);
@@ -69,13 +71,14 @@ const ChatInterface = () => {
 
     const handleCitationClick = (page: number) => {
         if (page <= numPages) {
+            dispatch(setViewMode('pdfview'));
             dispatch(setCurrentPage(page));
         }
     };
 
     return (
-        <div className="h-[calc(100%-20px)] bg-white m-2 rounded-2xl">
-            <div className="flex flex-col rounded-2xl border-2 border-gray-50 h-full " style={{
+        <div className="h-full lg:h-[calc(100%-20px)] bg-white lg:m-2 rounded-2xl">
+            <div className="flex flex-col rounded-2xl lg:border-2 border-gray-50 h-full " style={{
                 backgroundImage: `
         radial-gradient(circle at center, #f0ffff 0%, transparent 70%)
       `,
@@ -85,7 +88,7 @@ const ChatInterface = () => {
                 {/* Header Area */}
                 <div className="px-4 py-3">
                     <div className="flex items-center justify-end">
-                        <button className="text-gray-600 hover:text-gray-800 bg-gray-50 rounded-lg p-2 cursor-pointer" onClick={() => { dispatch(resetChat()); dispatch(resetPdf()) }}>
+                        <button className="p-1 hover:bg-gray-100 rounded-4xl cursor-pointer" onClick={() => { dispatch(resetChat()); dispatch(resetPdf()) }}>
                             <X className="w-5 h-5" />
                         </button>
                     </div>
@@ -97,8 +100,13 @@ const ChatInterface = () => {
                         <div className="flex items-center justify-center h-full text-center">
                             <div className="flex flex-col items-center">
                                 <img src={playpower_labs_logo} alt="Playpower Labs Logo" className="w-24 h-24 mb-4 rounded-lg" />
-                                <p className="text-gray-600 font-medium">Start a conversation</p>
-                                <p className="text-gray-500 text-sm mt-1">Ask questions about your PDF document</p>
+                                <TextShimmer
+                                    duration={1.2}
+                                    className='text-xl font-medium [--base-color:#223050] [--base-gradient-color:var(--color-blue-200)] dark:[--base-color:var(--color-blue-700)] dark:[--base-gradient-color:var(--color-blue-400)]'
+                                >
+                                    Hi, how are you?
+                                </TextShimmer>
+                                <TextShimmer className="text-gray-500 text-sm mt-1">Ask questions about your PDF document</TextShimmer>
                             </div>
                         </div>
                     ) : (
@@ -121,7 +129,7 @@ const ChatInterface = () => {
                         </>
                     )}
                 </div>
-                <div className="m-5">  <ChatInput onSubmit={handleSend} disabled={loading} /></div>
+                <div className="m-2 lg:m-5">  <ChatInput onSubmit={handleSend} disabled={loading} /></div>
             </div>
         </div>
 

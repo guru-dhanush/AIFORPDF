@@ -1,5 +1,4 @@
 import { generateChatResponse } from '../services/ai.service.js';
-import { getDocumentMetadata } from '../services/storage.service.js';
 import { AppError } from '../middleware/error.middleware.js';
 
 /**
@@ -18,11 +17,8 @@ export async function sendMessage(req, res, next) {
       throw new AppError('Message is required', 400);
     }
 
-    // Verify document exists
-    await getDocumentMetadata(documentId);
-
-    console.log(`💬 Processing chat message for document: ${documentId}`);
-    console.log(`   Query: "${message}"`);
+    console.log(`Processing chat message for document: ${documentId}`);
+    console.log(`Query: "${message}"`);
 
     // Generate AI response with RAG
     const response = await generateChatResponse(
@@ -31,7 +27,7 @@ export async function sendMessage(req, res, next) {
       chatHistory || []
     );
 
-    console.log(`✅ Response generated with ${response.citations.length} citations`);
+    console.log(`Response generated with ${response.citations.length} citations`);
 
     res.json({
       success: true,
