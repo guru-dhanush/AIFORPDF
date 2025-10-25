@@ -9,7 +9,7 @@ import { PromptSuggestion } from "@/shared/components/ui/prompt-suggestion"
 import { Button } from "@/shared/components/ui/button"
 import { ArrowUpIcon, Paperclip, X } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
-import { setInputValue } from "../chatSlice"
+import { resetChat, setInputValue } from "../chatSlice"
 import { setViewMode } from "@/features/dashboard/uiSlice"
 import { resetPdf } from "@/features/pdf/pdfSlice"
 
@@ -65,7 +65,10 @@ function ChatInput({ onSubmit, disabled = false }: ChatInputProps) {
                         <span className="max-w-[120px] truncate">{fileName}</span>
                         <button
                             className="hover:bg-secondary/50 rounded-full p-1"
-                            onClick={() => dispatch(resetPdf())}
+                            onClick={() => {
+                                dispatch(resetPdf())
+                                dispatch(resetChat())
+                            }}
                         >
                             <X className="size-4" />
                         </button>
