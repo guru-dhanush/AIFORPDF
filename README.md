@@ -1,6 +1,3 @@
-I'll help you create a comprehensive README.md file for your project that includes the images. Here's the content you can use:
-
-```markdown
 # AI-Powered Document Assistant
 
 A modern web application that allows users to upload PDF documents and interact with them using AI-powered chat.
