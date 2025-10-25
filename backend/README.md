@@ -1,6 +1,7 @@
-# NotebookLM - Backend
+# Playpower - AI-Powered Document Assistant (Backend)
 
-A backend API for a Google NotebookLM like application with RAG (Retrieval Augmented Generation) capabilities.
+A modern web application that allows users to upload PDF documents and interact with them using AI-powered chat.
+
 
 ## Features
 
