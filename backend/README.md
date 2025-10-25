@@ -1,6 +1,6 @@
-# NotebookLM Clone - Backend
+# NotebookLM - Backend
 
-A powerful backend API for a Google NotebookLM like application with RAG (Retrieval Augmented Generation) capabilities.
+A backend API for a Google NotebookLM like application with RAG (Retrieval Augmented Generation) capabilities.
 
 ## Features
 
@@ -100,7 +100,6 @@ Response:
     "filename": "document.pdf",
     "numPages": 50,
     "SuggestedQuestions": ["What are the main topics covered in this document?","Can you explain the key concepts mentioned?"],
-    "url": "https://storage.url"
   }
 }
 ```
