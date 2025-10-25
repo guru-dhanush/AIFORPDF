@@ -99,7 +99,7 @@ Response:
     "documentId": "uuid",
     "filename": "document.pdf",
     "numPages": 50,
-    "summary": "Document summary...",
+    "SuggestedQuestions": ["What are the main topics covered in this document?","Can you explain the key concepts mentioned?"],
     "url": "https://storage.url"
   }
 }
