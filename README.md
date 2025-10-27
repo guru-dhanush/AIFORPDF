@@ -38,7 +38,7 @@ A modern web application that allows users to upload PDF documents and interact 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/playpower.git
+   git clone https://github.com/guru-dhanush/playpower.git
    cd playpower
    ```
 
